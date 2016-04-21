@@ -6,12 +6,9 @@ import (
 	"io"
 	"crypto/md5"
 	"log"
+	"github.com/fatih/color"
+	"fmt"
 )
-
-//TODO checksum original
-//TODO copy
-//TODO checksum copy
-
 
 func main() {
 	app := cli.NewApp()
@@ -22,22 +19,29 @@ func main() {
 		fromPath := os.Args[1]
 		toPath := os.Args[2]
 
-		println("initsum")
+		if _, err := os.Stat(fromPath); os.IsNotExist(err) {
+			// fromPath does not exist, BAD!
+			fail(fromPath, "does not exist")
+		}
+
+		if _, err := os.Stat(toPath); err == nil {
+			// toPath exists, BAD!
+			fail(toPath, "already exists")
+		}
+
 		initSum, err := checksum(fromPath)
 		check(err)
 
-		println("copy")
 		copyError := copy(fromPath, toPath)
 		check(copyError)
 
-		println("postsum")
 		postSum, err := checksum(toPath)
 		check(err)
 
 		if (sliceEq(initSum, postSum)) {
 			//log.Println("copied ok :D")
 		} else {
-			log.Fatal("did not copy ok :(")
+			fail("did not copy ok :(")
 		}
 	}
 
@@ -105,5 +109,33 @@ func sliceEq(a, b []byte) bool {
 func check(e error) {
 	if (e != nil) {
 		log.Fatal(e)
+		os.Exit(1)
 	}
+}
+
+func fail(text ...string) {
+	PrintRed(text)
+	os.Exit(1)
+}
+
+func PrintGreen(s []string) {
+	color.Set(color.FgGreen)
+	PrintArray(s)
+	color.Unset()
+}
+
+func PrintRed(s []string) {
+	color.Set(color.FgRed)
+	PrintArray(s)
+	color.Unset()
+}
+
+func PrintArray(fs []string) {
+	for i, v := range fs {
+		if i > 0 {
+			fmt.Print(" ")
+		}
+		fmt.Print(v)
+	}
+	fmt.Println()
 }
