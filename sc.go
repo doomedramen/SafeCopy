@@ -14,34 +14,40 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "sc"
 	app.Usage = "copy files + checksum"
-	app.Action = func(c *cli.Context) {
+	app.ActionFunc = func(c *cli.Context) {
 
-		fromPath := os.Args[1]
-		toPath := os.Args[2]
+		if (len(os.Args) > 0) {
 
-		if _, err := os.Stat(fromPath); os.IsNotExist(err) {
-			// fromPath does not exist, BAD!
-			fail(fromPath, "does not exist")
-		}
+			fromPath := os.Args[1]
+			toPath := os.Args[2]
 
-		if _, err := os.Stat(toPath); err == nil {
-			// toPath exists, BAD!
-			fail(toPath, "already exists")
-		}
+			if _, err := os.Stat(fromPath); os.IsNotExist(err) {
+				// fromPath does not exist, BAD!
+				fail(fromPath, "does not exist")
+			}
 
-		initSum, err := checksum(fromPath)
-		check(err)
+			if _, err := os.Stat(toPath); err == nil {
+				// toPath exists, BAD!
+				fail(toPath, "already exists")
+			}
 
-		copyError := copy(fromPath, toPath)
-		check(copyError)
+			initSum, err := checksum(fromPath)
+			check(err)
 
-		postSum, err := checksum(toPath)
-		check(err)
+			copyError := copy(fromPath, toPath)
+			check(copyError)
 
-		if (sliceEq(initSum, postSum)) {
-			//log.Println("copied ok :D")
+			postSum, err := checksum(toPath)
+			check(err)
+
+			if (sliceEq(initSum, postSum)) {
+				//log.Println("copied ok :D")
+				PrintGreen("copied ok")
+			} else {
+				fail("did not copy ok :(")
+			}
 		} else {
-			fail("did not copy ok :(")
+			app.ShowAppHelp(c);
 		}
 	}
 
