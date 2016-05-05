@@ -14,7 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "sc"
 	app.Usage = "copy files + checksum"
-	app.ActionFunc = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) {
 
 		if (len(os.Args) > 0) {
 
