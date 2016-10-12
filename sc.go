@@ -17,7 +17,9 @@ func main() {
 	app.Usage = "copy files + checksum"
 	app.Action = func(c *cli.Context) error {
 
-		if (len(os.Args) > 0) {
+		//PrintGreen(string(len(os.Args)))
+
+		if (len(os.Args) == 3) {
 
 			fromPath := os.Args[1]
 			toPath := os.Args[2]
