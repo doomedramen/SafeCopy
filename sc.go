@@ -23,12 +23,12 @@ func main() {
 
 			if _, err := os.Stat(fromPath); os.IsNotExist(err) {
 				// fromPath does not exist, BAD!
-				fail(fromPath, "does not exist")
+				fail(fromPath + " does not exist")
 			}
 
 			if _, err := os.Stat(toPath); err == nil {
 				// toPath exists, BAD!
-				fail(toPath, "already exists")
+				fail(toPath + " already exists")
 			}
 
 			initSum, err := checksum(fromPath)
@@ -119,29 +119,19 @@ func check(e error) {
 	}
 }
 
-func fail(text ...string) {
+func fail(text string) {
 	PrintRed(text)
 	os.Exit(1)
 }
 
-func PrintGreen(s []string) {
+func PrintGreen(s string) {
 	color.Set(color.FgGreen)
-	PrintArray(s)
+	fmt.Print(s)
 	color.Unset()
 }
 
-func PrintRed(s []string) {
+func PrintRed(s string) {
 	color.Set(color.FgRed)
-	PrintArray(s)
+	fmt.Print(s)
 	color.Unset()
-}
-
-func PrintArray(fs []string) {
-	for i, v := range fs {
-		if i > 0 {
-			fmt.Print(" ")
-		}
-		fmt.Print(v)
-	}
-	fmt.Println()
 }
