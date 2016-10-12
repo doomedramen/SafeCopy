@@ -47,7 +47,7 @@ func main() {
 				fail("did not copy ok :(")
 			}
 		} else {
-			app.ShowAppHelp(c);
+			cli.ShowAppHelp(c);
 		}
 	}
 
