@@ -8,13 +8,14 @@ import (
 	"log"
 	"github.com/fatih/color"
 	"fmt"
+	"encoding/hex"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "sc"
 	app.Usage = "copy files + checksum"
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 
 		if (len(os.Args) > 0) {
 
@@ -23,18 +24,20 @@ func main() {
 
 			if _, err := os.Stat(fromPath); os.IsNotExist(err) {
 				// fromPath does not exist, BAD!
-				fail(fromPath + " does not exist")
+				fail(fromPath + " DOES NOT EXIST")
+				return nil
 			}
 
 			if _, err := os.Stat(toPath); err == nil {
 				// toPath exists, BAD!
-				fail(toPath + " already exists")
+				fail(toPath + " ALREADY EXISTS")
+				return nil
 			}
 
 			initSum, err := checksum(fromPath)
 			check(err)
 
-			copyError := copy(fromPath, toPath)
+			copyError := copyFile(fromPath, toPath)
 			check(copyError)
 
 			postSum, err := checksum(toPath)
@@ -42,12 +45,16 @@ func main() {
 
 			if (sliceEq(initSum, postSum)) {
 				//log.Println("copied ok :D")
-				PrintGreen("copied ok")
+				PrintGreen("COPIED OK (" + hex.EncodeToString(initSum) + " === " + hex.EncodeToString(postSum) + ")")
+				return nil
 			} else {
-				fail("did not copy ok :(")
+				fail("DID NOT COPY OK! :(")
+				//TODO delete bad copy
+				return nil
 			}
 		} else {
 			cli.ShowAppHelp(c);
+			return nil
 		}
 	}
 
@@ -70,7 +77,7 @@ func checksum(filePath string) ([]byte, error) {
 	return hash.Sum(result), nil
 }
 
-func copy(src, dst  string) error {
+func copyFile(src, dst  string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -126,12 +133,12 @@ func fail(text string) {
 
 func PrintGreen(s string) {
 	color.Set(color.FgGreen)
-	fmt.Print(s)
+	fmt.Println(s)
 	color.Unset()
 }
 
 func PrintRed(s string) {
 	color.Set(color.FgRed)
-	fmt.Print(s)
+	fmt.Println(s)
 	color.Unset()
 }
