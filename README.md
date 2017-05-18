@@ -4,10 +4,6 @@
 
 Safecopy is a command line tool for integrity checking a file when it is copied.
 It gets the md5 sum of a file before copying it and then comparing that to the md5 sum of the copied file.
-* md5sum file
-* copy file
-* check md5 of copied file
-* delete original
 
 
 ## Installation
